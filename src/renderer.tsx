@@ -14,11 +14,28 @@ import {
 } from "@tanstack/react-query";
 import { showError, showMcpConsentToast } from "./lib/toast";
 import i18n from "./i18n";
-import { IpcClient } from "./ipc/ipc_client";
 import { BridgeProvider, useBridge } from "./platform/BridgeProvider";
 
 // @ts-ignore
 console.log("Running in mode:", import.meta.env.MODE);
+
+// Provide a minimal Electron IPC shim for web builds so code that
+// references window.electron doesn't crash in the browser.
+if (!(window as any).electron) {
+  (window as any).electron = {
+    ipcRenderer: {
+      invoke: async () => {
+        const err = Object.assign(
+          new Error("Electron IPC is not available in web mode"),
+          { __silent: true },
+        );
+        return Promise.reject(err);
+      },
+      on: () => {},
+      removeListener: () => {},
+    },
+  } as any;
+}
 
 interface MyMeta extends Record<string, unknown> {
   showErrorToast: boolean;
@@ -42,6 +59,12 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error, query) => {
+      if ((error as any)?.__silent) return;
+      if (
+        error instanceof Error &&
+        error.message === "Electron IPC is not available in web mode"
+      )
+        return;
       if (query.meta?.showErrorToast) {
         showError(error);
       }
@@ -49,6 +72,12 @@ const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
+      if ((error as any)?.__silent) return;
+      if (
+        error instanceof Error &&
+        error.message === "Electron IPC is not available in web mode"
+      )
+        return;
       if (mutation.meta?.showErrorToast) {
         showError(error);
       }
@@ -92,16 +121,17 @@ const posthogClient = posthog.init(
 );
 
 function App() {
+  const bridge = useBridge();
   useEffect(() => {
     // Sync language from settings once at startup and on settings changes
     (async () => {
       try {
-        const settings = await IpcClient.getInstance().getUserSettings();
+        const settings = await bridge.getUserSettings();
         if (settings?.language) {
           i18n.changeLanguage(settings.language);
         }
       } catch (e) {
-        // ignore
+        // ignore in web mode or if settings are unavailable
       }
     })();
     // Subscribe to navigation state changes
@@ -124,7 +154,6 @@ function App() {
     };
   }, []);
 
-  const bridge = useBridge();
   useEffect(() => {
     const unsubscribe = bridge.onMcpToolConsentRequest((payload) => {
       showMcpConsentToast({

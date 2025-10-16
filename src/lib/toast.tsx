@@ -22,6 +22,14 @@ export const showSuccess = (message: string) => {
  * @param message The error message to display
  */
 export const showError = (message: any) => {
+  // Suppress web-mode IPC placeholder errors
+  if ((message as any)?.__silent) return;
+  if (
+    typeof message === "object" &&
+    message instanceof Error &&
+    message.message === "Electron IPC is not available in web mode"
+  )
+    return;
   const errorMessage = message.toString();
   console.error(message);
 
