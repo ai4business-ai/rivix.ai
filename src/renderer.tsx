@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { router } from "./router";
 import { RouterProvider } from "@tanstack/react-router";
 import { PostHogProvider } from "posthog-js/react";
+import "./i18n";
 import posthog from "posthog-js";
 import { getTelemetryUserId, isTelemetryOptedIn } from "./hooks/useSettings";
 import {
@@ -12,7 +13,9 @@ import {
   MutationCache,
 } from "@tanstack/react-query";
 import { showError, showMcpConsentToast } from "./lib/toast";
+import i18n from "./i18n";
 import { IpcClient } from "./ipc/ipc_client";
+import { BridgeProvider, useBridge } from "./platform/BridgeProvider";
 
 // @ts-ignore
 console.log("Running in mode:", import.meta.env.MODE);
@@ -90,6 +93,17 @@ const posthogClient = posthog.init(
 
 function App() {
   useEffect(() => {
+    // Sync language from settings once at startup and on settings changes
+    (async () => {
+      try {
+        const settings = await IpcClient.getInstance().getUserSettings();
+        if (settings?.language) {
+          i18n.changeLanguage(settings.language);
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
     // Subscribe to navigation state changes
     const unsubscribe = router.subscribe("onResolved", (navigation) => {
       // Capture the navigation event in PostHog
@@ -110,19 +124,19 @@ function App() {
     };
   }, []);
 
+  const bridge = useBridge();
   useEffect(() => {
-    const ipc = IpcClient.getInstance();
-    const unsubscribe = ipc.onMcpToolConsentRequest((payload) => {
+    const unsubscribe = bridge.onMcpToolConsentRequest((payload) => {
       showMcpConsentToast({
         serverName: payload.serverName,
         toolName: payload.toolName,
         toolDescription: payload.toolDescription,
         inputPreview: payload.inputPreview,
-        onDecision: (d) => ipc.respondToMcpConsentRequest(payload.requestId, d),
+        onDecision: (d) => bridge.respondToMcpConsentRequest(payload.requestId, d),
       });
     });
     return () => unsubscribe();
-  }, []);
+  }, [bridge]);
 
   return <RouterProvider router={router} />;
 }
@@ -131,7 +145,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <PostHogProvider client={posthogClient}>
-        <App />
+        <BridgeProvider>
+          <App />
+        </BridgeProvider>
       </PostHogProvider>
     </QueryClientProvider>
   </StrictMode>,

@@ -245,6 +245,7 @@ export const UserSettingsSchema = z.object({
   enableAutoUpdate: z.boolean(),
   releaseChannel: ReleaseChannelSchema,
   runtimeMode2: RuntimeMode2Schema.optional(),
+  language: z.enum(["ru", "en"]).optional(),
 
   ////////////////////////////////
   // E2E TESTING ONLY.

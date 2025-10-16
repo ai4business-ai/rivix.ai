@@ -11,6 +11,7 @@ import { ThinkingBudgetSelector } from "@/components/ThinkingBudgetSelector";
 import { useSettings } from "@/hooks/useSettings";
 import { useAppVersion } from "@/hooks/useAppVersion";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
 import { GitHubIntegration } from "@/components/GitHubIntegration";
@@ -27,6 +28,7 @@ import { RuntimeModeSelector } from "@/components/RuntimeModeSelector";
 import { ToolsMcpSettings } from "@/components/settings/ToolsMcpSettings";
 
 export default function SettingsPage() {
+  const { t, i18n } = useTranslation();
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const appVersion = useAppVersion();
@@ -60,15 +62,15 @@ export default function SettingsPage() {
           className="flex items-center gap-2 mb-4 bg-(--background-lightest) py-5"
         >
           <ArrowLeft className="h-4 w-4" />
-          Go Back
+          {t("common.settings.goBack")}
         </Button>
         <div className="flex justify-between mb-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Settings
+            {t("common.settings.settings")}
           </h1>
         </div>
 
-        <div className="space-y-6">
+          <div className="space-y-6">
           <GeneralSettings appVersion={appVersion} />
           <WorkflowSettings />
           <AISettings />
@@ -86,17 +88,17 @@ export default function SettingsPage() {
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
             >
               <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                Telemetry
+                {t("common.settings.telemetry")}
               </h2>
               <div className="space-y-2">
                 <TelemetrySwitch />
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  This records anonymous usage data to improve the product.
+                  
                 </div>
               </div>
 
               <div className="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                <span className="mr-2 font-medium">Telemetry ID:</span>
+                <span className="mr-2 font-medium">{t("common.settings.telemetryId")}</span>
                 <span className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-800 dark:text-gray-200 font-mono">
                   {settings ? settings.telemetryUserId : "n/a"}
                 </span>
@@ -110,7 +112,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Integrations
+              {t("common.settings.integrations")}
             </h2>
             <div className="space-y-4">
               <GitHubIntegration />
@@ -126,7 +128,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Tools (MCP)
+              {t("common.settings.toolsMcp")}
             </h2>
             <ToolsMcpSettings />
           </div>
@@ -137,7 +139,7 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
           >
             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Experiments
+              {t("common.settings.experiments")}
             </h2>
             <div className="space-y-4">
               <div className="space-y-1 mt-4">
@@ -151,10 +153,10 @@ export default function SettingsPage() {
                       });
                     }}
                   />
-                  <Label htmlFor="enable-native-git">Enable Native Git</Label>
+                  <Label htmlFor="enable-native-git">{t("common.settings.enableNativeGit")}</Label>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Native Git offers faster performance but requires{" "}
+                  
                   <a
                     onClick={() => {
                       IpcClient.getInstance().openExternalUrl(
@@ -163,7 +165,7 @@ export default function SettingsPage() {
                     }}
                     className="text-blue-600 hover:underline dark:text-blue-400"
                   >
-                    installing Git
+                    {t("common.settings.installGit")}
                   </a>
                   .
                 </div>
@@ -177,18 +179,17 @@ export default function SettingsPage() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-red-200 dark:border-red-800"
           >
             <h2 className="text-lg font-medium text-red-600 dark:text-red-400 mb-4">
-              Danger Zone
+              {t("common.settings.dangerZone")}
             </h2>
 
             <div className="space-y-4">
               <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Reset Everything
+                    {t("common.settings.resetEverything")}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    This will delete all your apps, chats, and settings. This
-                    action cannot be undone.
+                    {t("common.settings.resetWarning")}
                   </p>
                 </div>
                 <button
@@ -196,7 +197,7 @@ export default function SettingsPage() {
                   disabled={isResetting}
                   className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isResetting ? "Resetting..." : "Reset Everything"}
+                  {isResetting ? t("common.settings.resetting") : t("common.settings.resetEverything")}
                 </button>
               </div>
             </div>
@@ -206,10 +207,10 @@ export default function SettingsPage() {
 
       <ConfirmationDialog
         isOpen={isResetDialogOpen}
-        title="Reset Everything"
-        message="Are you sure you want to reset everything? This will delete all your apps, chats, and settings. This action cannot be undone."
-        confirmText="Reset Everything"
-        cancelText="Cancel"
+        title={t("common.settings.confirmResetTitle")}
+        message={t("common.settings.confirmResetMessage")}
+        confirmText={t("common.settings.confirm")}
+        cancelText={t("common.settings.cancel")}
         onConfirm={handleResetEverything}
         onCancel={() => setIsResetDialogOpen(false)}
       />
@@ -219,6 +220,8 @@ export default function SettingsPage() {
 
 export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation();
+  const { settings, updateSettings } = useSettings();
 
   return (
     <div
@@ -226,13 +229,13 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
       className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6"
     >
       <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        General Settings
+        {t("common.settings.general")}
       </h2>
 
       <div className="space-y-4 mb-4">
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Theme
+            {t("common.settings.theme")}
           </label>
 
           <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex">
@@ -255,13 +258,39 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
             ))}
           </div>
         </div>
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Язык
+          </label>
+          <div className="relative bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex">
+            {(["ru", "en"] as const).map((lng) => (
+              <button
+                key={lng}
+                onClick={async () => {
+                  await i18n.changeLanguage(lng);
+                  await updateSettings({ language: lng });
+                }}
+                className={`
+                px-4 py-1.5 text-sm font-medium rounded-md
+                transition-all duration-200
+                ${
+                  (settings?.language || "ru") === lng
+                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                }
+              `}
+              >
+                {lng.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-1 mt-4">
         <AutoUpdateSwitch />
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          This will automatically update the app when new versions are
-          available.
+          {t("common.settings.autoUpdateNote")}
         </div>
       </div>
 
@@ -274,7 +303,7 @@ export function GeneralSettings({ appVersion }: { appVersion: string | null }) {
       </div>
 
       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-        <span className="mr-2 font-medium">App Version:</span>
+        <span className="mr-2 font-medium">{t("common.settings.appVersion")}</span>
         <span className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-800 dark:text-gray-200 font-mono">
           {appVersion ? appVersion : "-"}
         </span>

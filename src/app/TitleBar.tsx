@@ -4,6 +4,7 @@ import { useLoadApps } from "@/hooks/useLoadApps";
 import { useRouter, useLocation } from "@tanstack/react-router";
 import { useSettings } from "@/hooks/useSettings";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 // @ts-ignore
 import logo from "../../assets/logo.svg";
 import { providerSettingsRoute } from "@/routes/settings/providers/$provider";
@@ -23,6 +24,7 @@ import {
 import { ActionHeader } from "@/components/preview_panel/ActionHeader";
 
 export const TitleBar = () => {
+  const { t } = useTranslation();
   const [selectedAppId] = useAtom(selectedAppIdAtom);
   const { apps } = useLoadApps();
   const { navigate } = useRouter();
@@ -63,8 +65,8 @@ export const TitleBar = () => {
   // Get selected app name
   const selectedApp = apps.find((app) => app.id === selectedAppId);
   const displayText = selectedApp
-    ? `App: ${selectedApp.name}`
-    : "(no app selected)";
+    ? `${t("common.app.appPrefix")} ${selectedApp.name}`
+    : t("common.app.noAppSelected");
 
   const handleAppClick = () => {
     if (selectedApp) {
@@ -115,6 +117,7 @@ export const TitleBar = () => {
 function WindowsControls() {
   const { isDarkMode } = useTheme();
   const ipcClient = IpcClient.getInstance();
+  const { t } = useTranslation();
 
   const minimizeWindow = () => {
     ipcClient.minimizeWindow();
@@ -134,6 +137,7 @@ function WindowsControls() {
         className="w-10 h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         onClick={minimizeWindow}
         aria-label="Minimize"
+        aria-label={t("common.titleBar.minimize")}
       >
         <svg
           width="12"
@@ -153,6 +157,7 @@ function WindowsControls() {
         className="w-10 h-10 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         onClick={maximizeWindow}
         aria-label="Maximize"
+        aria-label={t("common.titleBar.maximize")}
       >
         <svg
           width="12"
@@ -174,6 +179,7 @@ function WindowsControls() {
         className="w-10 h-10 flex items-center justify-center hover:bg-red-500 transition-colors"
         onClick={closeWindow}
         aria-label="Close"
+        aria-label={t("common.titleBar.close")}
       >
         <svg
           width="12"

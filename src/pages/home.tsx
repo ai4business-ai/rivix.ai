@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { ExternalLink } from "lucide-react";
 import { ImportAppButton } from "@/components/ImportAppButton";
 import { showError } from "@/lib/toast";
@@ -40,6 +41,7 @@ export interface HomeSubmitOptions {
 }
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useAtom(homeChatInputValueAtom);
   const navigate = useNavigate();
   const search = useSearch({ from: "/" });
@@ -175,11 +177,10 @@ export default function HomePage() {
             <div className="absolute top-0 left-0 w-full h-full border-8 border-t-primary rounded-full animate-spin"></div>
           </div>
           <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-200">
-            Building your app
+            {t("common.home.buildingYourApp")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-8">
-            We're setting up your app with AI magic. <br />
-            This might take a moment...
+            {t("common.home.buildingSubtitle")}
           </p>
         </div>
       </div>
@@ -245,7 +246,7 @@ export default function HomePage() {
               />
             </svg>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              More ideas
+              {t("common.home.moreIdeas")}
             </span>
           </button>
         </div>
@@ -257,7 +258,7 @@ export default function HomePage() {
       <Dialog open={releaseNotesOpen} onOpenChange={setReleaseNotesOpen}>
         <DialogContent className="max-w-4xl bg-(--docs-bg) pr-0 pt-4 pl-4 gap-1">
           <DialogHeader>
-            <DialogTitle>What's new in v{appVersion}?</DialogTitle>
+            <DialogTitle>{t("common.home.whatsNew", { version: appVersion || "" })}</DialogTitle>
             <Button
               variant="ghost"
               size="sm"
